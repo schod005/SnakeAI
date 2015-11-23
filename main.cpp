@@ -5,7 +5,6 @@
 #include "Grid.h"
 
 #define GRID_SIZE 40
-int SIZE = 100000;
 
 time_t now = 0, then = 0;
 int frames = 0;
