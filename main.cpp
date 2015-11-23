@@ -3,12 +3,16 @@
 #include <iomanip>
 #include "Constants.h"
 #include "Grid.h"
+#include <windows.h>
+
 
 #define GRID_SIZE 40
 
 time_t now = 0, then = 0;
 int frames = 0;
 void FPS();
+//init
+int init = 0;
 
 int main()
 {
@@ -27,9 +31,13 @@ int main()
 				window.close();
 		}
 		
-		window.clear();
-		grid->draw(window);
-		window.display();
+		    window.clear();
+			grid->randMove();      //generating a random 1 cell movement for the snake
+			grid->draw(window);
+			window.display();			
+
+			Sleep(80);            //adding some delay to see snake move
+			
 	}
 
 	return 0;
