@@ -6,7 +6,6 @@
 
 #define GRID_SIZE 40
 
-int testVar = 0;
 time_t now = 0, then = 0;
 int frames = 0;
 void FPS();
