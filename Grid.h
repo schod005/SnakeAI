@@ -70,7 +70,8 @@ Grid::Grid(int cols_, int rows_)
 	//snake start
 	drawGrid[0][0].setFillColor(sf::Color::Black);
 	//setting location of snake
-	snakeLoc.push_back(std::make_pair(0, 0));
+	snakeLoc.reserve(1000);
+	snakeLoc.emplace_back(std::make_pair(0, 0));
 
 }
 
@@ -112,7 +113,7 @@ void Grid::randMove()
 			//clear out old location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
 			//update new snake location and remove old
-			snakeLoc.push_back(std::make_pair(snakeLoc.at(0).first - 1, snakeLoc.at(0).second));
+			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first - 1, snakeLoc.at(0).second));
 			snakeLoc.erase(snakeLoc.begin());
 			//color in snake at new location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);
@@ -123,7 +124,7 @@ void Grid::randMove()
 			//clear out old location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
 			//update new snake location and remove old
-			snakeLoc.push_back(std::make_pair(snakeLoc.at(0).first, snakeLoc.at(0).second - 1));
+			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first, snakeLoc.at(0).second - 1));
 			snakeLoc.erase(snakeLoc.begin());
 			//color in snake at new location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);
@@ -134,7 +135,7 @@ void Grid::randMove()
 			//clear out old location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
 			//update new snake location and remove old
-			snakeLoc.push_back(std::make_pair(snakeLoc.at(0).first + 1, snakeLoc.at(0).second));
+			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first + 1, snakeLoc.at(0).second));
 			snakeLoc.erase(snakeLoc.begin());
 			//color in snake at new location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);
@@ -145,7 +146,7 @@ void Grid::randMove()
 			//clear out old location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
 			//update new snake location and remove old
-			snakeLoc.push_back(std::make_pair(snakeLoc.at(0).first, snakeLoc.at(0).second + 1));
+			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first, snakeLoc.at(0).second + 1));
 			snakeLoc.erase(snakeLoc.begin());
 			//color in snake at new location
 			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);

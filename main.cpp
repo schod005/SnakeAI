@@ -16,7 +16,7 @@ int init = 0;
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Snake");
-	window.setFramerateLimit(60);
+	//window.setFramerateLimit(60);
 	WINDOW_HANDLE = &window;
 	Grid *grid = new Grid(GRID_SIZE, GRID_SIZE);
 
