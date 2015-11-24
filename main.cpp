@@ -3,7 +3,6 @@
 #include <iomanip>
 #include "Constants.h"
 #include "Grid.h"
-#include <windows.h>
 
 
 #define GRID_SIZE 40
@@ -36,7 +35,7 @@ int main()
 			grid->draw(window);
 			window.display();			
 
-			Sleep(80);            //adding some delay to see snake move
+			sf::sleep(sf::Time(sf::milliseconds(80)));            //adding some delay to see snake move
 			
 	}
 
