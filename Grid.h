@@ -12,15 +12,21 @@ public:
 	~Grid();
 	void draw(sf::RenderWindow&);
 	void randMove();
+	void generateApple();
 
+	inline int getRows(){ return rows; }
+	inline int getCols(){ return cols; }
+	inline sf::RectangleShape **getDrawGrid(){ return drawGrid; }
+	inline sf::Vector2i getAppleLoc(){ return appleLoc; }
 
 private:
 	int **grid;
 	int rows;
 	int cols;
 	sf::RectangleShape **drawGrid;
-	std::pair <int, int> appleLoc; //holds coordinates to apple
-	std::vector <std::pair<int, int>> snakeLoc; //holds coordinates snake is in
+	sf::Vector2i appleLoc;
+	//std::pair <int, int> appleLoc; //holds coordinates to apple
+	//std::vector <std::pair<int, int>> snakeLoc; //holds coordinates snake is in
 
 };
 
@@ -42,7 +48,9 @@ Grid::Grid(int cols_, int rows_)
 	int rand_col = rand() % cols;
 
 	//assigning appleLoc first random location
-	appleLoc = std::make_pair(rand_col, rand_row);
+	//appleLoc = std::make_pair(rand_col, rand_row);
+	appleLoc.x = rand_col;
+	appleLoc.y = rand_row;
 
 	for (int i = 0; i < rows; i++)
 		grid[i] = new int[cols];
@@ -56,10 +64,10 @@ Grid::Grid(int cols_, int rows_)
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
 		{
-			drawGrid[i][j].setSize(sf::Vector2f(WINDOW_WIDTH / rows - 2,
-											    WINDOW_HEIGHT / cols - 2));
-			drawGrid[i][j].setPosition(sf::Vector2f(i * WINDOW_WIDTH / rows + 1,
-													j * WINDOW_HEIGHT / cols + 1));
+			drawGrid[i][j].setSize(sf::Vector2f((float)WINDOW_WIDTH / rows - 2,
+											    (float)WINDOW_HEIGHT / cols - 2));
+			drawGrid[i][j].setPosition(sf::Vector2f((float)i * WINDOW_WIDTH / rows + 1,
+													(float)j * WINDOW_HEIGHT / cols + 1));
 			drawGrid[i][j].setFillColor(sf::Color(140, 140, 140, 255));
 			
 		}
@@ -68,14 +76,25 @@ Grid::Grid(int cols_, int rows_)
 	drawGrid[rand_col][rand_row].setFillColor(sf::Color::Red);
 
 	//snake start
-	drawGrid[0][0].setFillColor(sf::Color::Black);
+	//drawGrid[0][0].setFillColor(sf::Color::Black);
 	//setting location of snake
-	snakeLoc.reserve(1000);
-	snakeLoc.emplace_back(std::make_pair(0, 0));
+	//snakeLoc.reserve(1000);
+	//snakeLoc.emplace_back(std::make_pair(0, 0));
 
 }
 
-//
+Grid::~Grid()
+{
+	for (int i = 0; i < rows; i++)
+	{
+		delete[] drawGrid[i];
+		delete[] grid[i];
+	}
+	delete[] drawGrid;
+	delete[] grid;
+}
+
+/*
 void Grid::randMove()
 {
 	//0 move left
@@ -158,7 +177,7 @@ void Grid::randMove()
 	}
 	
 }
-
+*/
 
 //git test
 void Grid::draw(sf::RenderWindow& window)
@@ -170,4 +189,13 @@ void Grid::draw(sf::RenderWindow& window)
 		}
 }
 
+void Grid::generateApple()
+{
+	int rand_row = rand() % rows;
+	int rand_col = rand() % cols;
 
+	appleLoc.x = rand_col;
+	appleLoc.y = rand_row;
+
+	drawGrid[appleLoc.x][appleLoc.y].setFillColor(sf::Color::Red);
+}

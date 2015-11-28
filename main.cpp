@@ -3,9 +3,8 @@
 #include <iomanip>
 #include "Constants.h"
 #include "Grid.h"
+#include "Snake.h"
 
-
-#define GRID_SIZE 40
 
 time_t now = 0, then = 0;
 int frames = 0;
@@ -15,10 +14,12 @@ int init = 0;
 
 int main()
 {
+	srand(time(0));
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Snake");
 	//window.setFramerateLimit(60);
 	WINDOW_HANDLE = &window;
 	Grid *grid = new Grid(GRID_SIZE, GRID_SIZE);
+	Snake *snake = new Snake(grid);
 
 	while (window.isOpen())
 	{
@@ -31,11 +32,12 @@ int main()
 		}
 		
 		    window.clear();
-			grid->randMove();      //generating a random 1 cell movement for the snake
+			snake->randMove();
+			//grid->randMove();      //generating a random 1 cell movement for the snake
 			grid->draw(window);
 			window.display();			
 
-			sf::sleep(sf::Time(sf::milliseconds(80)));            //adding some delay to see snake move
+			sf::sleep(sf::Time(sf::milliseconds(8)));            //adding some delay to see snake move
 			
 	}
 
