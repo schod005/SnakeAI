@@ -37,7 +37,7 @@ int main()
 			grid->draw(window);
 			window.display();			
 
-			sf::sleep(sf::Time(sf::milliseconds(8)));            //adding some delay to see snake move
+			sf::sleep(sf::Time(sf::milliseconds(80)));            //adding some delay to see snake move
 			
 	}
 

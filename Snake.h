@@ -89,6 +89,7 @@ void Snake::randMove()
 		Node* newHead = new Node;
 		newHead->next = head;
 		newHead->prev = nullptr;
+		head->prev = newHead;
 
 		switch (move)
 		{
@@ -146,29 +147,32 @@ void Snake::randMove()
 		{
 			//update colors and move tail to location of move
 			GRID->getDrawGrid()[tail->location.x][tail->location.y].setFillColor(sf::Color(140, 140, 140, 255));
-			head->next = tail;
-			tail->prev = head;
-			head = tail;
-			tail->prev->next = nullptr;
+			
+			Node* tempTail = tail;
 			tail = tail->prev;
-			head->next = nullptr;
+			tempTail->prev->next = nullptr;
+			tempTail->prev = nullptr;
+			tempTail->next = head;
+			head->prev = tempTail;
+			head = tempTail;
+
 			switch (move)
 			{
 			case UP:
-				head->location.y = head->prev->location.y - 1;
-				head->location.x = head->prev->location.x;
+				head->location.y = head->next->location.y - 1;
+				head->location.x = head->next->location.x;
 				break;
 			case DOWN:
-				head->location.y = head->prev->location.y + 1;
-				head->location.x = head->prev->location.x;
+				head->location.y = head->next->location.y + 1;
+				head->location.x = head->next->location.x;
 				break;
 			case LEFT:
-				head->location.y = head->prev->location.y;
-				head->location.x = head->prev->location.x - 1;
+				head->location.y = head->next->location.y;
+				head->location.x = head->next->location.x - 1;
 				break;
 			case RIGHT:
-				head->location.y = head->prev->location.y;
-				head->location.x = head->prev->location.x + 1;
+				head->location.y = head->next->location.y;
+				head->location.x = head->next->location.x + 1;
 				break;
 			default:
 				break;
