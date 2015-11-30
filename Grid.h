@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "Constants.h"
+//#include "Graph.h"
 #include <iostream>
 #ifndef GRID_HPP
 #define GRID_HPP
@@ -20,7 +21,6 @@ public:
 	inline sf::Vector2i getAppleLoc(){ return appleLoc; }
 
 private:
-	int **grid;
 	int rows;
 	int cols;
 	sf::RectangleShape **drawGrid;
@@ -41,7 +41,6 @@ Grid::Grid(int cols_, int rows_)
 {
 	rows = rows_;
 	cols = cols_;
-	grid = new int*[rows];
 
 	//generating two rand values for loc of apple
 	int rand_row = rand() % rows;
@@ -51,9 +50,6 @@ Grid::Grid(int cols_, int rows_)
 	//appleLoc = std::make_pair(rand_col, rand_row);
 	appleLoc.x = rand_col;
 	appleLoc.y = rand_row;
-
-	for (int i = 0; i < rows; i++)
-		grid[i] = new int[cols];
 
 	drawGrid = new sf::RectangleShape*[rows];
 	for (int i = 0; i < rows; i++)
@@ -88,10 +84,8 @@ Grid::~Grid()
 	for (int i = 0; i < rows; i++)
 	{
 		delete[] drawGrid[i];
-		delete[] grid[i];
 	}
 	delete[] drawGrid;
-	delete[] grid;
 }
 
 /*

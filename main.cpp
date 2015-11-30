@@ -19,7 +19,8 @@ int main()
 	//window.setFramerateLimit(60);
 	WINDOW_HANDLE = &window;
 	Grid *grid = new Grid(GRID_SIZE, GRID_SIZE);
-	Snake *snake = new Snake(grid);
+	Snake *snake1 = new Snake(grid, 0, 0);
+	Snake *snake2 = new Snake(grid, GRID_SIZE - 1, GRID_SIZE - 1);
 
 	while (window.isOpen())
 	{
@@ -31,13 +32,14 @@ int main()
 				window.close();
 		}
 		
-		    window.clear();
-			snake->randMove();
-			//grid->randMove();      //generating a random 1 cell movement for the snake
+		    //window.clear();
+			snake1->randMove();
+			snake2->randMove();
 			grid->draw(window);
 			window.display();			
 
-			sf::sleep(sf::Time(sf::milliseconds(80)));            //adding some delay to see snake move
+			sf::sleep(sf::Time(sf::milliseconds(8)));            //adding some delay to see snake move
+
 			
 	}
 

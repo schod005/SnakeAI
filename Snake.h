@@ -2,20 +2,25 @@
 #ifndef SNAKE_HPP
 #define SNAKE_HPP
 
+bool boundary_check(int, sf::Vector2i);
+
+enum{
+	LEFT = 0,
+	UP = 1,
+	RIGHT = 2,
+	DOWN = 3
+};
+
 class Snake
 {
 public:
 	Snake();
-	Snake(Grid*);
+	Snake(Grid*, int x, int y);
 	void randMove();
+	void aStarMove();
 	bool checkApple(int);
 
-	enum{
-		LEFT = 0,
-		UP = 1,
-		RIGHT = 2,
-		DOWN = 3
-	};
+
 
 private:
 	int length;
@@ -26,6 +31,7 @@ private:
 		Node* prev;
 		sf::Vector2i location;
 	}*head;
+
 	Node *tail;
 };
 
@@ -36,7 +42,7 @@ Snake::Snake()
 	//empty
 }
 
-Snake::Snake(Grid* Grid_)
+Snake::Snake(Grid* Grid_, int x, int y)
 {
 	length = 1;
 	head = new Node;
@@ -44,12 +50,12 @@ Snake::Snake(Grid* Grid_)
 	head->prev = nullptr;
 	//head->location.x = rand() % GRID_SIZE;
 	//head->location.y = rand() % GRID_SIZE;
-	head->location.x = 0;
-	head->location.y = 0;
+	head->location.x = x;
+	head->location.y = y;
 	tail = head;
 
 	GRID = Grid_;
-	GRID->getDrawGrid()[0][0].setFillColor(sf::Color::Black);
+	GRID->getDrawGrid()[x][y].setFillColor(sf::Color::Black);
 }
 
 void Snake::randMove()
@@ -64,13 +70,13 @@ void Snake::randMove()
 
 	//testing if we are sitting on boundary cases elminating those movements
 	if ((head->location.x == 0) && (head->location.y == 0))                    //move right if at top left corner
-		move = RIGHT;  
+		move = RIGHT;
 	else if ((head->location.x == GRID->getCols() - 1) && (head->location.y == 0))        //move down if at top right corner
 		move = DOWN;
 	else if ((head->location.x == GRID->getCols() - 1) && (head->location.y == GRID->getRows() - 1)) //move left if at bottum right corner
 		move = LEFT;
 	else if ((head->location.x == 0) && (head->location.y == GRID->getRows() - 1))        //move up if bottum left corner
-		move = UP;	
+		move = UP;
 	else if ((head->location.x == 0))
 		move = RIGHT;
 	else if ((head->location.x == GRID->getCols() - 1))
@@ -81,6 +87,66 @@ void Snake::randMove()
 		move = UP;
 	else
 		move = rand() % 4;
+
+	while (true)
+	{
+		if (move == UP)
+		{
+			if (!boundary_check(move, head->location))
+			{
+				move = rand() % 4;
+			}
+			else if (GRID->getDrawGrid()[head->location.x][head->location.y - 1].getFillColor() != sf::Color(140, 140, 140, 255) &&
+				GRID->getDrawGrid()[head->location.x][head->location.y - 1].getFillColor() != sf::Color::Red)
+			{
+				move = rand() % 4;
+			}
+			else
+				break;
+		}
+		if (move == DOWN)
+		{
+			if (!boundary_check(move, head->location))
+			{
+				move = rand() % 4;
+			}
+			else if (GRID->getDrawGrid()[head->location.x][head->location.y + 1].getFillColor() != sf::Color(140, 140, 140, 255) &&
+				GRID->getDrawGrid()[head->location.x][head->location.y + 1].getFillColor() != sf::Color::Red)
+			{
+				move = rand() % 4;
+			}
+			else
+				break;
+		}
+		if (move == LEFT)
+		{
+			if (!boundary_check(move, head->location))
+			{
+				move = rand() % 4;
+			}
+			else if (GRID->getDrawGrid()[head->location.x - 1][head->location.y].getFillColor() != sf::Color(140, 140, 140, 255) &&
+				GRID->getDrawGrid()[head->location.x - 1][head->location.y].getFillColor() != sf::Color::Red)
+			{
+				move = rand() % 4;
+			}
+			else
+				break;
+		}
+		if (move == RIGHT)
+		{
+			if (!boundary_check(move, head->location))
+			{
+				move = rand() % 4;
+			}
+			else if (GRID->getDrawGrid()[head->location.x + 1][head->location.y].getFillColor() != sf::Color(140, 140, 140, 255) &&
+				GRID->getDrawGrid()[head->location.x + 1][head->location.y].getFillColor() != sf::Color::Red)
+			{
+				move = rand() % 4;
+			}
+			else
+				break;
+		}
+	}
 
 	if (checkApple(move))
 	{
@@ -141,13 +207,14 @@ void Snake::randMove()
 			default:
 				break;
 			}
-			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Black);
+			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
 		}
 		else
 		{
 			//update colors and move tail to location of move
 			GRID->getDrawGrid()[tail->location.x][tail->location.y].setFillColor(sf::Color(140, 140, 140, 255));
-			
+			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Black);
+
 			Node* tempTail = tail;
 			tail = tail->prev;
 			tempTail->prev->next = nullptr;
@@ -177,7 +244,7 @@ void Snake::randMove()
 			default:
 				break;
 			}
-			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Black);
+			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
 		}
 	}
 
@@ -211,4 +278,22 @@ bool Snake::checkApple(int move)
 		return false;
 	}
 	return false;
+}
+
+void Snake::aStarMove()
+{
+
+}
+
+bool boundary_check(int move, sf::Vector2i location)
+{
+	if ((location.x == 0 && move == LEFT))
+		return false;
+	else if ((location.x == GRID_SIZE - 1 && move == RIGHT))
+		return false;
+	else if ((location.y == 0 && move == UP))
+		return false;
+	else if ((location.y == GRID_SIZE - 1 && move == DOWN))
+		return false;
+	return true;
 }
