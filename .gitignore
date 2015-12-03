@@ -1,6 +1,8 @@
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
+tags
+Makefile
 
 # Folder config file
 Desktop.ini

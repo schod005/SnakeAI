@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include "Constants.h"
-//#include "Graph.h"
 #include <iostream>
 #ifndef GRID_HPP
 #define GRID_HPP
@@ -12,8 +11,9 @@ public:
 	Grid(int, int);
 	~Grid();
 	void draw(sf::RenderWindow&);
-	void randMove();
 	void generateApple();
+  std::vector<sf::Vector2i> neighbors(sf::Vector2i Loc);
+  int aStarSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc);
 
 	inline int getRows(){ return rows; }
 	inline int getCols(){ return cols; }
@@ -25,8 +25,6 @@ private:
 	int cols;
 	sf::RectangleShape **drawGrid;
 	sf::Vector2i appleLoc;
-	//std::pair <int, int> appleLoc; //holds coordinates to apple
-	//std::vector <std::pair<int, int>> snakeLoc; //holds coordinates snake is in
 
 };
 
@@ -47,7 +45,6 @@ Grid::Grid(int cols_, int rows_)
 	int rand_col = rand() % cols;
 
 	//assigning appleLoc first random location
-	//appleLoc = std::make_pair(rand_col, rand_row);
 	appleLoc.x = rand_col;
 	appleLoc.y = rand_row;
 
@@ -70,13 +67,6 @@ Grid::Grid(int cols_, int rows_)
 
 	//adding a random apple at start of creation
 	drawGrid[rand_col][rand_row].setFillColor(sf::Color::Red);
-
-	//snake start
-	//drawGrid[0][0].setFillColor(sf::Color::Black);
-	//setting location of snake
-	//snakeLoc.reserve(1000);
-	//snakeLoc.emplace_back(std::make_pair(0, 0));
-
 }
 
 Grid::~Grid()
@@ -87,91 +77,6 @@ Grid::~Grid()
 	}
 	delete[] drawGrid;
 }
-
-/*
-void Grid::randMove()
-{
-	//0 move left
-	//1 move up
-	//2 move right
-	//3 move down
-
-	int move;
-
-	//testing if we are sitting on boundary cases elminating those movements
-	if ((snakeLoc.at(0).first == 0) && (snakeLoc.at(0).second == 0))                    //move right if at top left corner
-		move = 2;  
-	else if ((snakeLoc.at(0).first == cols - 1) && (snakeLoc.at(0).second == 0))        //move down if at top right corner
-		move = 3;
-	else if ((snakeLoc.at(0).first == cols - 1) && (snakeLoc.at(0).second == rows - 1)) //move left if at bottum right corner
-		move = 0;
-	else if ((snakeLoc.at(0).first == 0) && (snakeLoc.at(0).second == rows - 1))        //move up if bottum left corner
-		move = 1;	
-	else if ((snakeLoc.at(0).first == 0))
-		move = 2;
-	else if ((snakeLoc.at(0).first == cols - 1))
-		move = 3;
-	else if ((snakeLoc.at(0).second == 0))
-		move = 3;
-	else if ((snakeLoc.at(0).second == rows - 1))
-		move = 1;
-	else
-		move = rand() % 4;                                                              //free to move anywhere not at corner case
-
-	//making appropriate location updates and coloring cells in draw grid representing snake	
-	switch (move)
-	{
-		case 0: //moves snake left one cell
-		{
-			//clear out old location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
-			//update new snake location and remove old
-			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first - 1, snakeLoc.at(0).second));
-			snakeLoc.erase(snakeLoc.begin());
-			//color in snake at new location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);
-			break;
-		}
-		case 1: //move snake up one cell
-		{
-			//clear out old location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
-			//update new snake location and remove old
-			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first, snakeLoc.at(0).second - 1));
-			snakeLoc.erase(snakeLoc.begin());
-			//color in snake at new location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);
-			break;
-		}		
-		case 2: //move snake right one cell
-		{
-			//clear out old location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
-			//update new snake location and remove old
-			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first + 1, snakeLoc.at(0).second));
-			snakeLoc.erase(snakeLoc.begin());
-			//color in snake at new location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);
-			break;
-		}		
-		case 3: //move snake down one cell
-		{
-			//clear out old location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color(140, 140, 140, 255));
-			//update new snake location and remove old
-			snakeLoc.emplace_back(std::make_pair(snakeLoc.at(0).first, snakeLoc.at(0).second + 1));
-			snakeLoc.erase(snakeLoc.begin());
-			//color in snake at new location
-			drawGrid[snakeLoc.at(0).first][snakeLoc.at(0).second].setFillColor(sf::Color::Black);
-			break;
-		}		
-		default:
-			break;
-
-	}
-	
-}
-*/
 
 //git test
 void Grid::draw(sf::RenderWindow& window)
@@ -192,4 +97,29 @@ void Grid::generateApple()
 	appleLoc.y = rand_row;
 
 	drawGrid[appleLoc.x][appleLoc.y].setFillColor(sf::Color::Red);
+}
+
+std::vector<sf::Vector2i> Grid::neighbors(sf::Vector2i Loc)
+{
+  std::vector<sf::Vector2i> list;
+  if(Loc.x - 1 > 0 && drawGrid[Loc.x - 1][Loc.y].getFillColor() == sf::Color(140,140,140,255))
+    list.emplace_back(sf::Vector2i(Loc.x - 1, Loc.y));
+  if(Loc.x + 1 > 0 && drawGrid[Loc.x + 1][Loc.y].getFillColor() == sf::Color(140,140,140,255))
+    list.emplace_back(sf::Vector2i(Loc.x + 1, Loc.y));
+  if(Loc.y - 1 > 0 && drawGrid[Loc.x][Loc.y - 1].getFillColor() == sf::Color(140,140,140,255))
+    list.emplace_back(sf::Vector2i(Loc.x, Loc.y - 1));
+  if(Loc.y + 1 > 0 && drawGrid[Loc.x][Loc.y + 1].getFillColor() == sf::Color(140,140,140,255))
+    list.emplace_back(sf::Vector2i(Loc.x, Loc.y + 1));
+  return list;
+}
+
+inline double heuristic(sf::Vector2i Loc1, sf::Vector2i Loc2)
+{
+  return abs(Loc1.x - Loc2.x) + abs(Loc1.y - Loc2.y);
+}
+
+int Grid::aStarSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc)
+{
+
+
 }
