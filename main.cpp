@@ -35,14 +35,14 @@ int main()
     }
 
     window.clear();
-    snake1->randMove();
+    snake1->aStarMove();
 //     snake2->randMove();
 //     snake3->randMove();
 //     snake4->randMove();
     grid->draw(window);
     window.display();			
 
-    //			sf::sleep(sf::Time(sf::milliseconds(20)));            //adding some delay to see snake move
+    			sf::sleep(sf::Time(sf::milliseconds(150)));            //adding some delay to see snake move
 
 
   }

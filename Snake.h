@@ -4,13 +4,6 @@
 
 bool boundary_check(int, sf::Vector2i);
 
-enum{
-	LEFT = 0,
-	UP = 1,
-	RIGHT = 2,
-	DOWN = 3
-};
-
 class Snake
 {
 public:
@@ -64,8 +57,10 @@ void Snake::randMove()
 	//1 move up
 	//2 move right
 	//3 move down
-
-
+	for (int i = 0; i < GRID_SIZE; i++)
+		for (int j = 0; j < GRID_SIZE; j++)
+			if (GRID->getDrawGrid()[i][j].getFillColor() == sf::Color::Yellow)
+				GRID->getDrawGrid()[i][j].setFillColor(sf::Color(140, 140, 140, 255));
 	int move;
 
 	//testing if we are sitting on boundary cases elminating those movements
@@ -247,6 +242,7 @@ void Snake::randMove()
 			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
 		}
 	}
+	GRID->aStarSearch(head->location, GRID->getAppleLoc());
 
 }
 
@@ -282,7 +278,113 @@ bool Snake::checkApple(int move)
 
 void Snake::aStarMove()
 {
+	for (int i = 0; i < GRID_SIZE; i++)
+		for (int j = 0; j < GRID_SIZE; j++)
+			if (GRID->getDrawGrid()[i][j].getFillColor() == sf::Color::Yellow)
+				GRID->getDrawGrid()[i][j].setFillColor(sf::Color(140, 140, 140, 255));
+	
+	int move = GRID->aStarSearch(head->location, GRID->getAppleLoc());
 
+	if (checkApple(move))
+	{
+		//std::cout << length << std::endl;
+		//if apple is eaten, add a new head at its location
+		GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Black);
+		Node* newHead = new Node;
+		newHead->next = head;
+		newHead->prev = nullptr;
+		head->prev = newHead;
+
+		switch (move)
+		{
+		case UP:
+			newHead->location.x = head->location.x;
+			newHead->location.y = head->location.y - 1;
+			break;
+		case DOWN:
+			newHead->location.x = head->location.x;
+			newHead->location.y = head->location.y + 1;
+			break;
+		case LEFT:
+			newHead->location.x = head->location.x - 1;
+			newHead->location.y = head->location.y;
+			break;
+		case RIGHT:
+			newHead->location.x = head->location.x + 1;
+			newHead->location.y = head->location.y;
+			break;
+		default:
+			break;
+		}
+		head = newHead;
+		length++;
+
+		GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
+		GRID->generateApple();
+	}
+	else
+	{
+		if (length == 1)
+		{
+			//if length is 1, head and tail are pointing at the same thing, so just move head
+			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color(140, 140, 140, 255));
+			switch (move)
+			{
+			case UP:
+				head->location.y--;
+				break;
+			case DOWN:
+				head->location.y++;
+				break;
+			case LEFT:
+				head->location.x--;
+				break;
+			case RIGHT:
+				head->location.x++;
+				break;
+			default:
+				break;
+			}
+			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
+		}
+		else
+		{
+			//update colors and move tail to location of move
+			GRID->getDrawGrid()[tail->location.x][tail->location.y].setFillColor(sf::Color(140, 140, 140, 255));
+			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Black);
+
+			Node* tempTail = tail;
+			tail = tail->prev;
+			tempTail->prev->next = nullptr;
+			tempTail->prev = nullptr;
+			tempTail->next = head;
+			head->prev = tempTail;
+			head = tempTail;
+
+			switch (move)
+			{
+			case UP:
+				head->location.y = head->next->location.y - 1;
+				head->location.x = head->next->location.x;
+				break;
+			case DOWN:
+				head->location.y = head->next->location.y + 1;
+				head->location.x = head->next->location.x;
+				break;
+			case LEFT:
+				head->location.y = head->next->location.y;
+				head->location.x = head->next->location.x - 1;
+				break;
+			case RIGHT:
+				head->location.y = head->next->location.y;
+				head->location.x = head->next->location.x + 1;
+				break;
+			default:
+				break;
+			}
+			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
+		}
+	}
 }
 
 bool boundary_check(int move, sf::Vector2i location)
