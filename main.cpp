@@ -16,13 +16,16 @@ int main()
 {
   srand(time(0));
   sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Snake");
+  if (!font.loadFromFile("arial.ttf"))
+	  return 0;
   //window.setFramerateLimit(60);
   WINDOW_HANDLE = &window;
   Grid *grid = new Grid(GRID_SIZE, GRID_SIZE);
-  Snake *snake1 = new Snake(grid, 0, 0);
-//  Snake *snake2 = new Snake(grid, GRID_SIZE - 1, GRID_SIZE - 1);
-//   Snake *snake3 = new Snake(grid, GRID_SIZE - 1, 0);
-//   Snake *snake4 = new Snake(grid, 0, GRID_SIZE - 1);
+  Snake *snake1 = new Snake(grid, 0, 0, 1);
+//  Snake *snake2 = new Snake(grid, GRID_SIZE - 1, GRID_SIZE - 1, 2);
+//   Snake *snake3 = new Snake(grid, GRID_SIZE - 1, 0, 3);
+//   Snake *snake4 = new Snake(grid, 0, GRID_SIZE - 1, 4);
+ 
 
   while (window.isOpen())
   {
@@ -43,9 +46,11 @@ int main()
 //     snake3->randMove();
 //     snake4->randMove();
     grid->draw(window);
+	snake1->drawText();
+//	snake2->drawText();
     window.display();			
 
-//    			sf::sleep(sf::Time(sf::milliseconds(450)));            //adding some delay to see snake move
+    //			sf::sleep(sf::Time(sf::milliseconds(250)));            //adding some delay to see snake move
 
 
   }

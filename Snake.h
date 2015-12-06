@@ -8,15 +8,20 @@ class Snake
 {
 public:
 	Snake();
-	Snake(Grid*, int x, int y);
+	Snake(Grid*, int x, int y, int number);
+	void update(int);
 	void randMove();
 	void aStarMove();
 	bool checkApple(int);
+	void drawText() {WINDOW_HANDLE->draw(text);}
+	
 
 
 
 private:
 	int length;
+	int number;
+	sf::Text text;
 	Grid* GRID;
 	struct Node
 	{
@@ -35,8 +40,13 @@ Snake::Snake()
 	//empty
 }
 
-Snake::Snake(Grid* Grid_, int x, int y)
+Snake::Snake(Grid* Grid_, int x, int y, int number_)
 {
+	number = number_;
+	text.setFont(font);
+	text.setString(std::to_string(number));
+	text.setColor(sf::Color::Black);
+	text.setCharacterSize(20);
 	length = 1;
 	head = new Node;
 	head->next = nullptr;
@@ -83,8 +93,14 @@ void Snake::randMove()
 	else
 		move = rand() % 4;
 
+	int count = 0;
 	while (true)
 	{
+		count++;
+		if (count > 50)
+		{
+			std::cout << "SNAKE DEAD!  LENGTH: " << length << std::endl;
+		}
 		if (move == UP)
 		{
 			if (!boundary_check(move, head->location))
@@ -143,145 +159,44 @@ void Snake::randMove()
 		}
 	}
 
-	if (checkApple(move))
-	{
-		//std::cout << length << std::endl;
-		//if apple is eaten, add a new head at its location
-		Node* newHead = new Node;
-		newHead->next = head;
-		newHead->prev = nullptr;
-		head->prev = newHead;
-
-		switch (move)
-		{
-		case UP:
-			newHead->location.x = head->location.x;
-			newHead->location.y = head->location.y - 1;
-			break;
-		case DOWN:
-			newHead->location.x = head->location.x;
-			newHead->location.y = head->location.y + 1;
-			break;
-		case LEFT:
-			newHead->location.x = head->location.x - 1;
-			newHead->location.y = head->location.y;
-			break;
-		case RIGHT:
-			newHead->location.x = head->location.x + 1;
-			newHead->location.y = head->location.y;
-			break;
-		default:
-			break;
-		}
-		head = newHead;
-		length++;
-
-		GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Black);
-		GRID->generateApple();
-	}
-	else
-	{
-		if (length == 1)
-		{
-			//if length is 1, head and tail are pointing at the same thing, so just move head
-			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color(140, 140, 140, 255));
-			switch (move)
-			{
-			case UP:
-				head->location.y--;
-				break;
-			case DOWN:
-				head->location.y++;
-				break;
-			case LEFT:
-				head->location.x--;
-				break;
-			case RIGHT:
-				head->location.x++;
-				break;
-			default:
-				break;
-			}
-			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
-		}
-		else
-		{
-			//update colors and move tail to location of move
-			GRID->getDrawGrid()[tail->location.x][tail->location.y].setFillColor(sf::Color(140, 140, 140, 255));
-			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Black);
-
-			Node* tempTail = tail;
-			tail = tail->prev;
-			tempTail->prev->next = nullptr;
-			tempTail->prev = nullptr;
-			tempTail->next = head;
-			head->prev = tempTail;
-			head = tempTail;
-
-			switch (move)
-			{
-			case UP:
-				head->location.y = head->next->location.y - 1;
-				head->location.x = head->next->location.x;
-				break;
-			case DOWN:
-				head->location.y = head->next->location.y + 1;
-				head->location.x = head->next->location.x;
-				break;
-			case LEFT:
-				head->location.y = head->next->location.y;
-				head->location.x = head->next->location.x - 1;
-				break;
-			case RIGHT:
-				head->location.y = head->next->location.y;
-				head->location.x = head->next->location.x + 1;
-				break;
-			default:
-				break;
-			}
-			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
-		}
-	}
-	GRID->aStarSearch(head->location, GRID->getAppleLoc());
+	update(move);
+	//GRID->aStarSearch(head->location, GRID->getAppleLoc());
 
 }
 
-bool Snake::checkApple(int move)
-{
-	sf::Vector2i appleLoc = GRID->getAppleLoc();
-	//std::cout << "apple at location (" << appleLoc.x << ',' << appleLoc.y << ")" << std::endl;
-	//std::cout << "head at location (" << head->location.x << ',' << head->location.y << ")" << std::endl;
 
-	switch (move)
-	{
-	case UP:
-		if (appleLoc.x == head->location.x && appleLoc.y == head->location.y - 1)
-			return true;
-		break;
-	case DOWN:
-		if (appleLoc.x == head->location.x && appleLoc.y == head->location.y + 1)
-			return true;
-		break;
-	case LEFT:
-		if (appleLoc.x == head->location.x - 1 && appleLoc.y == head->location.y)
-			return true;
-		break;
-	case RIGHT:
-		if (appleLoc.x == head->location.x + 1 && appleLoc.y == head->location.y)
-			return true;
-		break;
-	default:
-		return false;
-	}
-	return false;
-}
 
 void Snake::aStarMove()
 {
-
-	
 	int move = GRID->aStarSearch(head->location, GRID->getAppleLoc());
+	if (move != -1)
+		update(move);
+	else
+	{
+		for (int i = 0; i < GRID_SIZE; i++)
+			for (int j = 0; j < GRID_SIZE; j++)
+				if (GRID->getDrawGrid()[i][j].getFillColor() == sf::Color::Yellow || GRID->getDrawGrid()[i][j].getFillColor() == sf::Color::Blue)
+					GRID->getDrawGrid()[i][j].setFillColor(sf::Color(140, 140, 140, 255));
+		randMove();
+	}
+		//std::cout << "DEAD!  Snake length = " << length << std::endl;
+}
 
+bool boundary_check(int move, sf::Vector2i location)
+{
+	if ((location.x == 0 && move == LEFT))
+		return false;
+	else if ((location.x == GRID_SIZE - 1 && move == RIGHT))
+		return false;
+	else if ((location.y == 0 && move == UP))
+		return false;
+	else if ((location.y == GRID_SIZE - 1 && move == DOWN))
+		return false;
+	return true;
+}
+
+void Snake::update(int move)
+{
 	if (checkApple(move))
 	{
 		//std::cout << length << std::endl;
@@ -382,17 +297,37 @@ void Snake::aStarMove()
 			GRID->getDrawGrid()[head->location.x][head->location.y].setFillColor(sf::Color::Green);
 		}
 	}
+
+	text.setPosition(GRID->getDrawGrid()[head->location.x][head->location.y].getPosition());
+	text.setString(std::to_string(number) + "\n" + std::to_string(length));
 }
 
-bool boundary_check(int move, sf::Vector2i location)
+bool Snake::checkApple(int move)
 {
-	if ((location.x == 0 && move == LEFT))
+	sf::Vector2i appleLoc = GRID->getAppleLoc();
+	//std::cout << "apple at location (" << appleLoc.x << ',' << appleLoc.y << ")" << std::endl;
+	//std::cout << "head at location (" << head->location.x << ',' << head->location.y << ")" << std::endl;
+
+	switch (move)
+	{
+	case UP:
+		if (appleLoc.x == head->location.x && appleLoc.y == head->location.y - 1)
+			return true;
+		break;
+	case DOWN:
+		if (appleLoc.x == head->location.x && appleLoc.y == head->location.y + 1)
+			return true;
+		break;
+	case LEFT:
+		if (appleLoc.x == head->location.x - 1 && appleLoc.y == head->location.y)
+			return true;
+		break;
+	case RIGHT:
+		if (appleLoc.x == head->location.x + 1 && appleLoc.y == head->location.y)
+			return true;
+		break;
+	default:
 		return false;
-	else if ((location.x == GRID_SIZE - 1 && move == RIGHT))
-		return false;
-	else if ((location.y == 0 && move == UP))
-		return false;
-	else if ((location.y == GRID_SIZE - 1 && move == DOWN))
-		return false;
-	return true;
+	}
+	return false;
 }

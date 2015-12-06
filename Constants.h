@@ -5,7 +5,8 @@
 static int WINDOW_WIDTH = 600;
 static int WINDOW_HEIGHT = 600;
 static sf::RenderWindow *WINDOW_HANDLE;
-#define GRID_SIZE 40
+static sf::Font font;
+#define GRID_SIZE 29
 
 enum{
 	LEFT = 0,

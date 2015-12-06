@@ -44,13 +44,8 @@ Grid::Grid(int cols_, int rows_)
 	rows = rows_;
 	cols = cols_;
 
-	//generating two rand values for loc of apple
-	int rand_row = rand() % rows;
-	int rand_col = rand() % cols;
 
-	//assigning appleLoc first random location
-	appleLoc.x = rand_col;
-	appleLoc.y = rand_row;
+
 
 	drawGrid = new sf::RectangleShape*[rows];
 	for (int i = 0; i < rows; i++)
@@ -70,7 +65,12 @@ Grid::Grid(int cols_, int rows_)
 		}
 
 	//adding a random apple at start of creation
-	drawGrid[rand_col][rand_row].setFillColor(sf::Color::Red);
+	for (int yy = 1; yy < GRID_SIZE; yy+=4)
+		for (int xx = 1; xx < GRID_SIZE; xx += 4)
+			for (int i = xx; i < 2 + xx && i < GRID_SIZE; i++)
+				for (int j = yy; j < 2 + yy && j < GRID_SIZE; j++)
+					drawGrid[i][j].setFillColor(sf::Color::Magenta);
+	generateApple();
 }
 
 Grid::~Grid()
@@ -98,7 +98,8 @@ void Grid::generateApple()
 	int rand_col = rand() % cols;
 
 	while (drawGrid[rand_col][rand_row].getFillColor() == sf::Color::Black ||
-		   drawGrid[rand_col][rand_row].getFillColor() == sf::Color::Green)
+		   drawGrid[rand_col][rand_row].getFillColor() == sf::Color::Green ||
+		   drawGrid[rand_col][rand_row].getFillColor() == sf::Color::Magenta)
 	{
 		rand_row = rand() % rows;
 		rand_col = rand() % cols;
@@ -115,13 +116,21 @@ void Grid::generateApple()
 std::vector<sf::Vector2i> Grid::neighbors(sf::Vector2i Loc)
 {
   std::vector<sf::Vector2i> list;
-  if(Loc.x - 1 >= 0 && (drawGrid[Loc.x - 1][Loc.y].getFillColor() == sf::Color(140,140,140,255) || drawGrid[Loc.x - 1][Loc.y].getFillColor() == sf::Color::Red))
+  if(Loc.x - 1 >= 0 && (drawGrid[Loc.x - 1][Loc.y].getFillColor() == sf::Color(140,140,140,255) ||
+						drawGrid[Loc.x - 1][Loc.y].getFillColor() == sf::Color::Red ||
+						drawGrid[Loc.x - 1][Loc.y].getFillColor() == sf::Color::Blue))
     list.emplace_back(sf::Vector2i(Loc.x - 1, Loc.y));
-  if(Loc.x + 1 < GRID_SIZE && (drawGrid[Loc.x + 1][Loc.y].getFillColor() == sf::Color(140,140,140,255) || drawGrid[Loc.x + 1][Loc.y].getFillColor() == sf::Color::Red))
+  if(Loc.x + 1 < GRID_SIZE && (drawGrid[Loc.x + 1][Loc.y].getFillColor() == sf::Color(140,140,140,255) || 
+							   drawGrid[Loc.x + 1][Loc.y].getFillColor() == sf::Color::Red ||
+							   drawGrid[Loc.x + 1][Loc.y].getFillColor() == sf::Color::Blue))
     list.emplace_back(sf::Vector2i(Loc.x + 1, Loc.y));
-  if(Loc.y - 1 >= 0 && (drawGrid[Loc.x][Loc.y - 1].getFillColor() == sf::Color(140,140,140,255) || drawGrid[Loc.x][Loc.y - 1].getFillColor() == sf::Color::Red))
+  if(Loc.y - 1 >= 0 && (drawGrid[Loc.x][Loc.y - 1].getFillColor() == sf::Color(140,140,140,255) || 
+						drawGrid[Loc.x][Loc.y - 1].getFillColor() == sf::Color::Red ||
+						drawGrid[Loc.x][Loc.y - 1].getFillColor() == sf::Color::Blue))
     list.emplace_back(sf::Vector2i(Loc.x, Loc.y - 1));
-  if(Loc.y + 1 < GRID_SIZE && (drawGrid[Loc.x][Loc.y + 1].getFillColor() == sf::Color(140,140,140,255) || drawGrid[Loc.x][Loc.y + 1].getFillColor() == sf::Color::Red))
+  if(Loc.y + 1 < GRID_SIZE && (drawGrid[Loc.x][Loc.y + 1].getFillColor() == sf::Color(140,140,140,255) || 
+							   drawGrid[Loc.x][Loc.y + 1].getFillColor() == sf::Color::Red ||
+							   drawGrid[Loc.x][Loc.y + 1].getFillColor() == sf::Color::Blue))
     list.emplace_back(sf::Vector2i(Loc.x, Loc.y + 1));
   return list;
 }
@@ -204,7 +213,8 @@ int Grid::aStarSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc)
 			int new_cost = cost_so_far[sfVecToInt(current)] + 1;
 			if (!cost_so_far.count(sfVecToInt(next)) || new_cost < cost_so_far[sfVecToInt(next)])
 			{
-				drawGrid[next.x][next.y].setFillColor(sf::Color::Blue);
+				if (next != destLoc)
+					drawGrid[next.x][next.y].setFillColor(sf::Color::Blue);
 				cost_so_far[sfVecToInt(next)] = new_cost;
 				int priority = new_cost + heuristic(next, destLoc);
 				frontier.put(next, priority);
@@ -219,7 +229,9 @@ int Grid::aStarSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc)
 	std::vector <sf::Vector2i> path = reconstruct_path(currentLoc, destLoc, came_from);
 //	std::cout << "MOVE TO LOCATION (" << intTosfVec(came_from[sfVecToInt(currentLoc)]).x 
 //			  << "," << intTosfVec(came_from[sfVecToInt(currentLoc)]).y << ")\n";
-			
+	
+	if (path[0].x == -1)
+		return -1;
 	sf::Vector2i next = path[1];
 	if (currentLoc.x - next.x == -1)
 		return RIGHT;
@@ -229,7 +241,7 @@ int Grid::aStarSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc)
 		return DOWN;
 	if (currentLoc.y - next.y == 1)
 		return UP;
-	return 0;
+	return -1;
 }
 
 std::vector<sf::Vector2i> Grid::reconstruct_path(sf::Vector2i& currentLoc, sf::Vector2i& destLoc, std::unordered_map<int, int>& came_from)
@@ -252,10 +264,13 @@ std::vector<sf::Vector2i> Grid::reconstruct_path(sf::Vector2i& currentLoc, sf::V
 		path.push_back(current);
 	//	std::cout << "(" << current.x << "," << current.y << ")\n";
 	}
-	std::reverse(path.begin(), path.end());
-	for (int i = 1; i < path.size() - 1; i++)
+	if (path[0].x != -1)
 	{
-		drawGrid[path[i].x][path[i].y].setFillColor(sf::Color::Yellow);
+		std::reverse(path.begin(), path.end());
+		for (int i = 1; i < path.size() - 1; i++)
+		{
+			drawGrid[path[i].x][path[i].y].setFillColor(sf::Color::Yellow);
+		}
 	}
 	return path;
 }
