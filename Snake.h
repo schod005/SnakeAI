@@ -278,10 +278,7 @@ bool Snake::checkApple(int move)
 
 void Snake::aStarMove()
 {
-	for (int i = 0; i < GRID_SIZE; i++)
-		for (int j = 0; j < GRID_SIZE; j++)
-			if (GRID->getDrawGrid()[i][j].getFillColor() == sf::Color::Yellow)
-				GRID->getDrawGrid()[i][j].setFillColor(sf::Color(140, 140, 140, 255));
+
 	
 	int move = GRID->aStarSearch(head->location, GRID->getAppleLoc());
 

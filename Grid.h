@@ -141,7 +141,7 @@ sf::Vector2i intTosfVec(int num)
 
 inline double heuristic(sf::Vector2i Loc1, sf::Vector2i Loc2)
 {
-  return abs(Loc1.x - Loc2.x) + abs(Loc1.y - Loc2.y);
+	return abs(Loc1.x - Loc2.x) + abs(Loc1.y - Loc2.y);
 }
 
 template <class T> struct greater1
@@ -204,6 +204,7 @@ int Grid::aStarSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc)
 			int new_cost = cost_so_far[sfVecToInt(current)] + 1;
 			if (!cost_so_far.count(sfVecToInt(next)) || new_cost < cost_so_far[sfVecToInt(next)])
 			{
+				drawGrid[next.x][next.y].setFillColor(sf::Color::Blue);
 				cost_so_far[sfVecToInt(next)] = new_cost;
 				int priority = new_cost + heuristic(next, destLoc);
 				frontier.put(next, priority);
@@ -244,15 +245,17 @@ std::vector<sf::Vector2i> Grid::reconstruct_path(sf::Vector2i& currentLoc, sf::V
 		if (count > GRID_SIZE * GRID_SIZE)
 		{
 			std::cout << "DEAD" << std::endl;
+			path[0].x = -1;
+			break;
 		}
 		current = intTosfVec(came_from[sfVecToInt(current)]);
 		path.push_back(current);
 	//	std::cout << "(" << current.x << "," << current.y << ")\n";
 	}
 	std::reverse(path.begin(), path.end());
-	for (int i = 1; i < path.size(); i++)
+	for (int i = 1; i < path.size() - 1; i++)
 	{
-	//	drawGrid[path[i].x][path[i].y].setFillColor(sf::Color::Yellow);
+		drawGrid[path[i].x][path[i].y].setFillColor(sf::Color::Yellow);
 	}
 	return path;
 }

@@ -20,7 +20,7 @@ int main()
   WINDOW_HANDLE = &window;
   Grid *grid = new Grid(GRID_SIZE, GRID_SIZE);
   Snake *snake1 = new Snake(grid, 0, 0);
-//   Snake *snake2 = new Snake(grid, GRID_SIZE - 1, GRID_SIZE - 1);
+//  Snake *snake2 = new Snake(grid, GRID_SIZE - 1, GRID_SIZE - 1);
 //   Snake *snake3 = new Snake(grid, GRID_SIZE - 1, 0);
 //   Snake *snake4 = new Snake(grid, 0, GRID_SIZE - 1);
 
@@ -33,16 +33,19 @@ int main()
       if (event.type == sf::Event::Closed)
         window.close();
     }
-
+	for (int i = 0; i < GRID_SIZE; i++)
+		for (int j = 0; j < GRID_SIZE; j++)
+			if (grid->getDrawGrid()[i][j].getFillColor() == sf::Color::Yellow || grid->getDrawGrid()[i][j].getFillColor() == sf::Color::Blue)
+				grid->getDrawGrid()[i][j].setFillColor(sf::Color(140, 140, 140, 255));
     window.clear();
     snake1->aStarMove();
-//     snake2->randMove();
+//    snake2->aStarMove();
 //     snake3->randMove();
 //     snake4->randMove();
     grid->draw(window);
     window.display();			
 
-    			sf::sleep(sf::Time(sf::milliseconds(150)));            //adding some delay to see snake move
+//    			sf::sleep(sf::Time(sf::milliseconds(450)));            //adding some delay to see snake move
 
 
   }
