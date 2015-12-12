@@ -1,15 +1,19 @@
+//SFML Headers
 #include <SFML/Graphics.hpp>
-#include <iostream>
-#include <iomanip>
+
+//Project Headers
 #include "Constants.h"
 #include "Grid.h"
 #include "Snake.h"
+
+//System Headers
+#include <iostream>
+#include <iomanip>
 
 
 time_t now = 0, then = 0;
 int frames = 0;
 void FPS();
-//init
 int init = 0;
 
 int main()
@@ -42,15 +46,17 @@ int main()
 				grid->getDrawGrid()[i][j].setFillColor(sf::Color(140, 140, 140, 255));
     window.clear();
     snake1->aStarMove();
-//    snake2->aStarMove();
+//    snake2->depthFirstMove();
 //     snake3->randMove();
 //     snake4->randMove();
     grid->draw(window);
 	snake1->drawText();
 //	snake2->drawText();
+//	snake3->drawText();
+//	snake4->drawText();
     window.display();			
 
-    //			sf::sleep(sf::Time(sf::milliseconds(250)));            //adding some delay to see snake move
+	sf::sleep(sf::Time(sf::milliseconds(100)));            //adding some delay to see snake move
 
 
   }
