@@ -25,7 +25,7 @@ public:
 	std::vector<sf::Vector2i> neighbors(sf::Vector2i Loc);
 	int aStarSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc);
 	int depthFirstSearch(sf::Vector2i currentLoc, sf::Vector2i destLoc);
-	bool Grid::dfs(sf::Vector2i currentLoc, sf::Vector2i destLoc, std::unordered_map<int, int>& came_from, bool** visited);
+	bool dfs(sf::Vector2i currentLoc, sf::Vector2i destLoc, std::unordered_map<int, int>& came_from, bool** visited);
 	std::vector<sf::Vector2i> reconstruct_path(sf::Vector2i& currentLoc, sf::Vector2i& destLoc, std::unordered_map<int, int>&);
 
 	inline int getRows(){ return rows; }
